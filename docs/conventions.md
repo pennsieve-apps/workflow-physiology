@@ -192,7 +192,9 @@ decision is in `channels.csv` `typing` so a user can see and override it.
   group) are copied as a `TimeIntervals` table `stimulation_source` with one row per trial and one
   column per parameter, exactly as found (names as in the source); `stim-events` reads it.
 - `physio-import` runs NWB Inspector (the `nwbinspector` package, as `nwb-inspect` does) on each
-  file it writes; files with CRITICAL issues fail that recording.
+  file it writes; files with CRITICAL issues fail that recording, **except** CRITICAL messages
+  about missing subject metadata (age, sex, subject id), which public and animal datasets often
+  lack: those are listed in `qc.csv` and `nwbinspector.csv` and the recording is kept.
 
 ### `events.tsv` (BIDS style)
 
@@ -278,7 +280,7 @@ its own parameter.
 
 | App | Inputs | Outputs |
 |---|---|---|
-| physio-import | `recordings` (anything readable, subfolder; plus optional `channels-map.csv`, `recordings-map.csv`, SDS `subjects.xlsx` / `samples.xlsx` / `manifest.xlsx`; a BIDS dataset's `_physio`/`_stim` files with their inherited sidecars, `participants.tsv` and the run's `_events.tsv`) | `physio` (the dataset), `qc` (qc.csv, one overview PNG per recording) |
+| physio-import | `recordings` (anything readable, subfolder; plus optional `channels-map.csv`, `recordings-map.csv`, SDS `subjects.xlsx` / `samples.xlsx` / `manifest.xlsx`; a BIDS dataset's `_physio`/`_stim` files with their inherited sidecars, `participants.tsv` and the run's `_events.tsv`) | `physio` (the dataset), `qc` (qc.csv, one overview PNG per recording, and copies of `recordings.csv` and `channels.csv` so a report linked only to `qc` can show subjects, signals and calibration) |
 | stim-events | `physio`, `params` (optional: parameter tables CSV/XLSX, a `stim-map.yaml`) | `events` |
 | ecg-hrv | `physio`, `events` (optional) | `hrv` |
 | bp-resp | `physio`, `events` (optional), `hrv` (optional: beats from ecg-hrv, for BRS and RSA) | `bp` |
