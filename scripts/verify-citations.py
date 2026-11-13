@@ -169,6 +169,13 @@ def check_reference(ref: dict) -> list[str]:
                     errs.append(f"author {i + 1}: cff {got!r} vs {giv!r}")
                 continue
             f2 = a.get("family-names", "") or a.get("name", "")
+            if a.get("name") and giv and fam:
+                # a corporate author the publisher split into given/family and truncated
+                # (Crossref's deposit of Task Force 1996, doi:10.1161/01.CIR.93.5.1043)
+                whole = norm(a["name"])
+                words = norm(giv).split()[:-1]
+                if whole.endswith(norm(fam)) and words and all(w in whole.split() for w in words):
+                    continue
             if a.get("name") and not giv:  # a consortium Crossref stores as a family name
                 if difflib.SequenceMatcher(None, norm(f2), norm(fam)).ratio() < 0.85:
                     errs.append(f"author {i + 1}: cff {f2!r} vs {fam!r}")
