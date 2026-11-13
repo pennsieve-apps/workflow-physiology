@@ -60,11 +60,19 @@ for s in $D406_SUBJECTS; do $S3 sync "$BUCKET/406/files/primary/sub-$s/" "$OUT/d
 
 # Fantasia (PhysioNet), checksummed
 F="$OUT/fantasia"; mkdir -p "$F"; base="https://physionet.org/files/fantasia/1.0.0"
-curl -sS -L --retry 5 -o "$F/SHA256SUMS.txt" "$base/SHA256SUMS.txt"
-curl -sS -L --retry 5 -o "$F/LICENSE.txt" "$base/LICENSE.txt" || true
+curl -fsS -L --retry 5 -o "$F/SHA256SUMS.txt" "$base/SHA256SUMS.txt"
+# Fantasia has no LICENSE.txt on PhysioNet (a plain curl would save the 404 page): write the terms.
+cat > "$F/LICENSE.txt" <<'LIC'
+Fantasia Database v1.0.0 (PhysioNet, doi:10.13026/C2RG61)
+Licence: Open Data Commons Attribution License v1.0 (ODC-By 1.0),
+https://opendatacommons.org/licenses/by/1-0/ (as stated on https://physionet.org/content/fantasia/1.0.0/).
+Please cite Iyengar N, Peng CK, Morin R, Goldberger AL, Lipsitz LA. Am J Physiol 1996;271:R1078-R1084,
+doi:10.1152/ajpregu.1996.271.4.R1078, and Goldberger AL et al. Circulation 2000;101:e215-e220,
+doi:10.1161/01.CIR.101.23.e215.
+LIC
 for r in $FANTASIA_RECORDS; do
   for ext in hea dat ecg; do
-    [ -f "$F/$r.$ext" ] || curl -sS -L --retry 5 -o "$F/$r.$ext" "$base/$r.$ext"
+    [ -f "$F/$r.$ext" ] || curl -fsS -L --retry 5 -o "$F/$r.$ext" "$base/$r.$ext"
   done
 done
 (cd "$F" && for r in $FANTASIA_RECORDS; do grep -E " $r\.(hea|dat|ecg)$" SHA256SUMS.txt; done | sed 's/ /  /' | shasum -a 256 -c --quiet) \
@@ -72,11 +80,11 @@ done
 
 # Autonomic Aging (PhysioNet), checksummed
 A="$OUT/autonomic-aging"; mkdir -p "$A"; base="https://physionet.org/files/autonomic-aging-cardiovascular/1.0.0"
-curl -sS -L --retry 5 -o "$A/SHA256SUMS.txt" "$base/SHA256SUMS.txt"
-curl -sS -L --retry 5 -o "$A/LICENSE.txt" "$base/LICENSE.txt" || true
-curl -sS -L --retry 5 -o "$A/subject-info.csv" "$base/subject-info.csv"
+curl -fsS -L --retry 5 -o "$A/SHA256SUMS.txt" "$base/SHA256SUMS.txt"
+curl -fsS -L --retry 5 -o "$A/LICENSE.txt" "$base/LICENSE.txt" || true
+curl -fsS -L --retry 5 -o "$A/subject-info.csv" "$base/subject-info.csv"
 for r in $AGING_RECORDS; do
-  for ext in hea dat; do [ -f "$A/$r.$ext" ] || curl -sS -L --retry 5 -o "$A/$r.$ext" "$base/$r.$ext"; done
+  for ext in hea dat; do [ -f "$A/$r.$ext" ] || curl -fsS -L --retry 5 -o "$A/$r.$ext" "$base/$r.$ext"; done
 done
 (cd "$A" && for r in $AGING_RECORDS; do grep -E " $r\.(hea|dat)$" SHA256SUMS.txt; done | sed 's/ /  /' | shasum -a 256 -c --quiet) \
   || { echo "Autonomic Aging checksum mismatch"; exit 1; }
