@@ -204,7 +204,7 @@ tested.
 Re-check the LICENSE of what you bundle (the survey has them as of 2026-11-12). Our own code is
 Apache-2.0. Chosen tools are BSD/MIT/Apache: NeuroKit2 (MIT), wfdb (MIT), neo (BSD-3), pynwb and
 hdmf (BSD-3), nwbinspector (BSD-3), h5py (BSD-3), numpy/scipy (BSD-3), pandas (BSD-3), openpyxl
-(MIT), pymatreader (BSD-2), bioread (MIT, uwmadison-chm), pyedflib (BSD-2), statsmodels (BSD-3),
+(MIT), pymatreader (BSD-2), bioread (MIT, uwmadison-chm), pyedflib (BSD-3), statsmodels (BSD-3),
 matplotlib (PSF-style), pyyaml (MIT), WeasyPrint (BSD-3).
 
 Do **not** use: hrv-analysis, py-ecg-detectors, PhysioZoo / mhrv code, Kilosort4, MSNA-Burst-Analysis
