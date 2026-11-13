@@ -129,7 +129,7 @@ sample), `recorded_s` (time actually covered by samples: smaller than `duration_
 recording has gaps), `n_segments` (contiguous segments), `channel_types` (`|`-joined, e.g.
 `ecg|stim|nerve`), `source_format` (`edf`, `bdf`, `wfdb`, `abf`, `smr`, `acq`, `nwb`, `hdf5`,
 `mat`, `csv`, `xlsx`, `wav`, `bids-physio`), `source_path` (as given), `metadata_source` (`mapping`, `sds`,
-`bids`, `file`, `none`, `|`-joined), `age`, `sex` when known, `task`, `run` (the BIDS entities of a BIDS physio recording, else empty).
+`bids`, `file`, `none`, `|`-joined), `age`, `sex` when known, `task`, `run` (the BIDS entities of a BIDS physio recording, else empty), `start_time_tz` (`local` when `start_time` is a wall clock, `UTC` when it is an instant such as Unix time stamps, empty when there is no start time; `start_time` itself stays without an offset).
 
 ### `channels.csv` and channel types
 
