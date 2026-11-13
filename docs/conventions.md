@@ -17,7 +17,7 @@ file wins for the physiology apps.
 
 | App | What | Compute |
 |---|---|---|
-| `physio-import` | Read physiological recordings in common formats (EDF/BDF, WFDB, Axon ABF, Spike2 `.smr`, BIOPAC `.acq`, NWB, HDF5, MATLAB `.mat`, CSV/TSV/XLSX, WAV), type and calibrate the channels (ECG, BP, respiration, nerve, EMG, stimulation, heart rate, ...), write one NWB file per recording plus index tables, keep any markers the source has | standard (Lambda-eligible when it fits) |
+| `physio-import` | Read physiological recordings in common formats (EDF/BDF, WFDB, Axon ABF, Spike2 `.smr`, BIOPAC `.acq`, NWB, HDF5, MATLAB `.mat`, CSV/TSV/XLSX, WAV, BIDS physiological recordings `_physio.tsv.gz`/`_stim.tsv.gz`), type and calibrate the channels (ECG, BP, respiration, nerve, EMG, stimulation, heart rate, ...), write one NWB file per recording plus index tables, keep any markers the source has | standard (Lambda-eligible when it fits) |
 | `stim-events` | Find stimulation epochs and their parameters (amplitude, pulse width, frequency, duration, polarity, waveform, site) from trigger, monitor or envelope channels, imported markers, parameter tables, file/folder names, or SDS metadata; one `events.tsv` | standard (Lambda) |
 | `ecg-hrv` | R-peaks, beat labels, heart rate, heart rate variability (time, frequency, non-linear), species presets; HRV over the whole recording, per stimulation phase when events are linked | standard (Lambda) |
 | `bp-resp` | Beat-to-beat systolic/diastolic/mean pressure, respiration rate and depth, spontaneous baroreflex sensitivity (sequence and spectral methods), respiratory sinus arrhythmia | standard (Lambda) |
@@ -128,8 +128,8 @@ wall clock without an offset when known, else empty), `duration_s` (span from fi
 sample), `recorded_s` (time actually covered by samples: smaller than `duration_s` when the
 recording has gaps), `n_segments` (contiguous segments), `channel_types` (`|`-joined, e.g.
 `ecg|stim|nerve`), `source_format` (`edf`, `bdf`, `wfdb`, `abf`, `smr`, `acq`, `nwb`, `hdf5`,
-`mat`, `csv`, `xlsx`, `wav`), `source_path` (as given), `metadata_source` (`mapping`, `sds`,
-`bids`, `file`, `none`, `|`-joined), `age`, `sex` when known.
+`mat`, `csv`, `xlsx`, `wav`, `bids-physio`), `source_path` (as given), `metadata_source` (`mapping`, `sds`,
+`bids`, `file`, `none`, `|`-joined), `age`, `sex` when known, `task`, `run` (the BIDS entities of a BIDS physio recording, else empty).
 
 ### `channels.csv` and channel types
 
@@ -267,7 +267,7 @@ its own parameter.
 
 | App | Inputs | Outputs |
 |---|---|---|
-| physio-import | `recordings` (anything readable, subfolder; plus optional `channels-map.csv`, `recordings-map.csv`, SDS `subjects.xlsx` / `samples.xlsx` / `manifest.xlsx`) | `physio` (the dataset), `qc` (qc.csv, one overview PNG per recording) |
+| physio-import | `recordings` (anything readable, subfolder; plus optional `channels-map.csv`, `recordings-map.csv`, SDS `subjects.xlsx` / `samples.xlsx` / `manifest.xlsx`; a BIDS dataset's `_physio`/`_stim` files with their inherited sidecars, `participants.tsv` and the run's `_events.tsv`) | `physio` (the dataset), `qc` (qc.csv, one overview PNG per recording) |
 | stim-events | `physio`, `params` (optional: parameter tables CSV/XLSX, a `stim-map.yaml`) | `events` |
 | ecg-hrv | `physio`, `events` (optional) | `hrv` |
 | bp-resp | `physio`, `events` (optional), `hrv` (optional: beats from ecg-hrv, for BRS and RSA) | `bp` |
