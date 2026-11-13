@@ -139,14 +139,18 @@ recording has gaps), `n_segments` (contiguous segments), `channel_types` (`|`-jo
 the signal is uncalibrated, e.g. Fantasia's BP), `scale` (the factor applied to reach `unit`),
 `site` (body site or electrode when known, e.g. `cervical vagus right`), `typing` (`mapping` |
 `name` | `content` | `default`: how the type was decided), `status` (`good` | `flat` |
-`saturated` | `noisy`) and `status_description`.
+`saturated` | `noisy`), `status_description` and `derived_from` (empty for a raw channel; for a
+processed copy of another channel (filtered, cleaned, rectified, enveloped, ...) the `channel` it
+was derived from, or `unknown` when no raw sibling exists). Consumers prefer raw channels, never
+treat a channel and its derivative as independent leads, and use a derived channel only when no
+raw one of that type exists.
 
 Types (closed list; anything else is `other` and is kept):
 
 | `type` | Signal | NWB unit |
 |---|---|---|
 | `ecg` | electrocardiogram, any lead | `V` |
-| `bp` | arterial or finger blood pressure waveform | `mmHg` (`calibrated=false` when only relative) |
+| `bp` | **arterial** or finger blood pressure waveform (not venous, ventricular or atrial) | `mmHg` (`calibrated=false` when only relative) |
 | `resp` | respiration: belt, airflow, thermistor, plethysmography, impedance | as recorded (`a.u.` when unknown) |
 | `ppg` | photoplethysmogram | `a.u.` |
 | `nerve` | nerve recording (cuff, intrafascicular, microneurography) | `V` |
@@ -154,14 +158,21 @@ Types (closed list; anything else is `other` and is kept):
 | `stim` | stimulus trigger, monitor or command channel, or a stimulation parameter envelope (amplitude or frequency over time) | as recorded; the envelope's quantity goes in `site`/`original_name` |
 | `hr` | heart rate computed by the acquisition device | `bpm` |
 | `temp` | temperature | `degC` |
-| `pressure` | other pressures (bladder, gastric, airway) | `mmHg` or `cmH2O` |
+| `pressure` | other pressures (venous, ventricular, atrial, bladder, gastric, airway, unspecified `Pressure 1`) | `mmHg` or `cmH2O`; a transducer voltage is `calibrated=false` |
 | `other` | anything else | as recorded |
 
 Typing: a user `channels-map.csv` anywhere in the input (columns `pattern` (case-insensitive
 regular expression on the original name), `type`, `unit`, `scale`, `site`, `name`) wins; else
-name heuristics (`ECG|EKG|Lead (I|II|III)` → ecg, `BP|ABP|ART|NIBP|Finapres|pressure` → bp,
-`RESP|breath|thorax|abdomen|airflow|pneumo` → resp, `PPG|pleth` → ppg, `ENG|nerve|vagus|cuff|CAP`
-→ nerve, `EMG` → emg, `stim|trig|TTL|marker|pulse|StimAmp|CtrlAmp` → stim, `^HR$|heart.?rate` → hr);
+name heuristics on whole tokens (`ECG|EKG|Lead (I|II|III)` → ecg; `BP|ABP|ART|NIBP|Finapres|arterial
+pressure|blood pressure` → bp, but venous/ventricular/atrial/`CVP|LVP|RVP|PAP` and a bare
+`pressure` → pressure; `RESP|respiration|respiratory|breath|thorax|abdomen|airflow|pneumo` → resp
+(not `response`, `responder`); `PPG|pleth|pulse|pulse ox|finger pulse|SpO2 pleth` → ppg (LabChart,
+BIOPAC and Finapres call the finger-pulse transducer "Pulse"); `ENG|nerve|vagus|cuff|CAP|CNAP|ECAP`
+→ nerve; `EMG` → emg; `stim|trig|TTL|marker|stim pulse|pulse train|StimAmp|CtrlAmp` → stim (a bare
+`pulse` is **not** stim); `^HR$|heart.?rate` → hr). A name token `processed|filtered|filt|clean(ed)|
+smoothed|rectified|integrated|envelope|derived` keeps the type and sets `derived_from`. BIDS
+physio: `cardiac` → ppg unless described as ECG, `trigger` → other; a BIDS `_stim` file is the
+presented stimulus (audio, luminance), so its columns are `other` unless named trigger/TTL/stim.
 else a content check where it is reliable (a channel of 0/1 steps is `stim`); else `other`. Every
 decision is in `channels.csv` `typing` so a user can see and override it.
 
