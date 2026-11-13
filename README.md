@@ -5,8 +5,8 @@ Pennsieve apps in the [pennsieve-apps](https://github.com/pennsieve-apps) organi
 recordings as labs export them (EDF, WFDB, Axon ABF, Spike2, BIOPAC, NWB, HDF5, MATLAB, CSV, WAV)
 and work the same whether or not the data follow a particular consortium's layout:
 
-- **Cardiovascular Response to Nerve Stimulation:** `physio-import → stim-events → {ecg-hrv, bp-resp} → stim-dose-response`
-- **Heart Rate Variability and Baroreflex:** `physio-import → {ecg-hrv, bp-resp}`
+- **Cardiovascular Response to Nerve Stimulation:** `physio-import → stim-events → {ecg-hrv, bp-resp} → stim-dose-response → physio-report`
+- **Heart Rate Variability and Baroreflex:** `physio-import → {ecg-hrv, bp-resp} → physio-report`
 
 | App | What it adds |
 |---|---|
@@ -15,6 +15,7 @@ and work the same whether or not the data follow a particular consortium's layou
 | [ecg-hrv](https://github.com/pennsieve-apps/ecg-hrv) | R-peaks, heart rate, heart rate variability (NeuroKit2) with species presets, per recording and per stimulation |
 | [bp-resp](https://github.com/pennsieve-apps/bp-resp) | Beat-to-beat blood pressure, respiration, spontaneous baroreflex sensitivity, respiratory sinus arrhythmia |
 | [stim-dose-response](https://github.com/pennsieve-apps/stim-dose-response) | Baseline/during/after responses per stimulation, dose-response fits, thresholds, response surfaces, neural fulcrum |
+| [physio-report](https://github.com/pennsieve-apps/physio-report) | One HTML + PDF report of a run: every step's figures and captions, headline numbers, licence notices, references |
 
 The contract between the apps is `docs/conventions.md`; `docs/builder-brief.md` and
 `docs/review-brief.md` are the briefs the apps are built and reviewed against; the literature and

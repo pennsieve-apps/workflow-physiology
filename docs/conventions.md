@@ -22,14 +22,15 @@ file wins for the physiology apps.
 | `ecg-hrv` | R-peaks, beat labels, heart rate, heart rate variability (time, frequency, non-linear), species presets; HRV over the whole recording, per stimulation phase when events are linked | standard (Lambda) |
 | `bp-resp` | Beat-to-beat systolic/diastolic/mean pressure, respiration rate and depth, spontaneous baroreflex sensitivity (sequence and spectral methods), respiratory sinus arrhythmia | standard (Lambda) |
 | `stim-dose-response` | Baseline vs during vs after each stimulation for every physiological series it is given; dose-response fits (thresholds, EC50, maximum), amplitude x frequency response surfaces, the neural fulcrum | standard (Lambda) |
+| `physio-report` | One HTML + PDF report of a run: every linked step's `summary.json` figures in order with captions, the recordings and QC tables, headline HRV, BP/BRS and dose-response numbers, `licence_notice`s, and references built from each step's `citations` | standard (Lambda) |
 
 Repo names carry **no `processor-` prefix**. Ports, parameters and file layouts are below.
 
 Workflows (defined in `workflow/` once the apps exist):
 
-- **Cardiovascular Response to Nerve Stimulation:** `physio-import → stim-events → {ecg-hrv, bp-resp} → stim-dose-response`
+- **Cardiovascular Response to Nerve Stimulation:** `physio-import → stim-events → {ecg-hrv, bp-resp} → stim-dose-response → physio-report`
   (`stim-events` also feeds `ecg-hrv`, `bp-resp` and `stim-dose-response` directly).
-- **Heart Rate Variability and Baroreflex** (resting recordings, no stimulation): `physio-import → {ecg-hrv, bp-resp}`.
+- **Heart Rate Variability and Baroreflex** (resting recordings, no stimulation): `physio-import → {ecg-hrv, bp-resp} → physio-report`.
 
 A recording without blood pressure or respiration still runs through both workflows: `bp-resp`
 reports it as skipped (see "Missing signals" below) and the other steps carry on.
@@ -271,6 +272,7 @@ its own parameter.
 | ecg-hrv | `physio`, `events` (optional) | `hrv` |
 | bp-resp | `physio`, `events` (optional), `hrv` (optional: beats from ecg-hrv, for BRS and RSA) | `bp` |
 | stim-dose-response | `events`, and any of `hrv`, `bp` (series.csv), `physio` (optional, for figures with raw traces) | `responses` |
+| physio-report | any of `qc`, `events`, `hrv`, `bp`, `responses` (all optional; at least one) | `report` (report.html, report.pdf, `tables/`) |
 
 Media types in `app.yml` (platform registry only): NWB `application/x-hdf5; profile=nwb`, HDF5
 `application/x-hdf5`, tables `text/csv`, `text/tab-separated-values`, XLSX

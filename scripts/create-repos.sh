@@ -14,4 +14,5 @@ stim-events|Pennsieve app: finds stimulation epochs and their parameters from tr
 ecg-hrv|Pennsieve app: ECG R-peak detection, heart rate and heart rate variability (NeuroKit2) for humans and animals, per recording and per stimulation
 bp-resp|Pennsieve app: beat-to-beat blood pressure, respiration, spontaneous baroreflex sensitivity and respiratory sinus arrhythmia
 stim-dose-response|Pennsieve app: physiological responses to stimulation with dose-response fits, thresholds, response surfaces and the neural fulcrum
+physio-report|Pennsieve app: one HTML and PDF report of a physiology workflow run, with every step's figures, headline numbers and references
 LIST

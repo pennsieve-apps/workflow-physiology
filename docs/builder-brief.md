@@ -3,11 +3,11 @@
 You are building one or more Pennsieve processor apps, each in its own git repo under
 `~/code/pennsieve/<repo>` (remote `git@github.com:pennsieve-apps/<repo>.git`, public). Repo names
 carry **no `processor-` prefix**: `physio-import`, `stim-events`, `ecg-hrv`, `bp-resp`,
-`stim-dose-response`. Refer to sibling apps by these names. They form two workflows for
+`stim-dose-response`, `physio-report`. Refer to sibling apps by these names. They form two workflows for
 cardiovascular and autonomic physiology, human and animal:
 
-- **Cardiovascular Response to Nerve Stimulation:** `physio-import → stim-events → {ecg-hrv, bp-resp} → stim-dose-response`
-- **Heart Rate Variability and Baroreflex:** `physio-import → {ecg-hrv, bp-resp}`
+- **Cardiovascular Response to Nerve Stimulation:** `physio-import → stim-events → {ecg-hrv, bp-resp} → stim-dose-response → physio-report`
+- **Heart Rate Variability and Baroreflex:** `physio-import → {ecg-hrv, bp-resp} → physio-report`
 
 **These apps are for the whole community, not one consortium.** Names, descriptions, READMEs,
 parameters and defaults must make sense to any physiology or neuromodulation lab with ECG, blood
@@ -190,6 +190,14 @@ tested.
   original definition is for chronic, duty-cycled VNS in conscious animals. Bootstrap CIs (`SEED`).
   Figures: response time course per parameter level (mean ± SD across trains), dose-response
   curves with fits per subject, the surface as a heat map, per-event table.
+- **physio-report**: like `~/code/pennsieve/eeg-report` and `neuro-report`: renders each linked
+  step's `summary.json` figures in order with their captions; a recordings table (subject, species,
+  duration, signals present, skipped steps and why); the QC summary from `physio-import`; headline
+  numbers (resting HR and HRV, BP and BRS with the published reference ranges the steps cite,
+  thresholds, EC50 and fulcrum per subject from `stim-dose-response`); every `licence_notice`
+  prominently; a references section built from each step's `citations` DOIs (bundle the verified
+  citation table). Works with whichever ports are linked, so the same app ends both workflows.
+  HTML + PDF (WeasyPrint, BSD-3) + `tables/` (copies of the key CSVs). Lambda-sized.
 
 ## Licences
 
@@ -197,7 +205,7 @@ Re-check the LICENSE of what you bundle (the survey has them as of 2026-11-12). 
 Apache-2.0. Chosen tools are BSD/MIT/Apache: NeuroKit2 (MIT), wfdb (MIT), neo (BSD-3), pynwb and
 hdmf (BSD-3), nwbinspector (BSD-3), h5py (BSD-3), numpy/scipy (BSD-3), pandas (BSD-3), openpyxl
 (MIT), pymatreader (BSD-2), bioread (MIT, uwmadison-chm), pyedflib (BSD-2), statsmodels (BSD-3),
-matplotlib (PSF-style), pyyaml (MIT).
+matplotlib (PSF-style), pyyaml (MIT), WeasyPrint (BSD-3).
 
 Do **not** use: hrv-analysis, py-ecg-detectors, PhysioZoo / mhrv code, Kilosort4, MSNA-Burst-Analysis
 (GPL-3.0); pyPPG (GPL-3.0 with an "academic research purpose only" preamble); ASCENT, PyFibers
