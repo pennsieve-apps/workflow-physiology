@@ -1,0 +1,174 @@
+{
+ "name": "Heart Rate Variability and Baroreflex",
+ "summary": "Resting heart rate variability, beat-to-beat blood pressure, respiration, baroreflex sensitivity and RSA, with a report.",
+ "description": "For resting or long recordings without stimulation, in humans or animals: imports recordings from common acquisition formats into NWB (physio-import), detects R-peaks and computes heart rate and heart rate variability (time, frequency and non-linear; ecg-hrv), beat-to-beat systolic, diastolic and mean pressure, respiration, spontaneous baroreflex sensitivity and respiratory sinus arrhythmia (bp-resp), and writes an HTML/PDF report with published reference ranges for human recordings. Species presets for human, pig, dog, rabbit, rat and mouse. Recordings without blood pressure or respiration still get HRV. Research use only.",
+ "inputs": [
+  {
+   "id": "recordings",
+   "name": "Physiological recordings",
+   "description": "Recordings as your acquisition system exports them: EDF/BDF, PhysioNet WFDB, Axon ABF, Spike2 .smr, BIOPAC .acq, NWB, HDF5, MATLAB .mat, CSV/TSV/XLSX, WAV, or BIDS physiological recordings; optionally a channels-map.csv, a stim-map.yaml with parameter tables, and subject metadata (BIDS participants.tsv or SDS subjects.xlsx).",
+   "position": {
+    "x": 450,
+    "y": 0
+   }
+  }
+ ],
+ "processors": [
+  {
+   "id": "import",
+   "type": "processor",
+   "sourceUrl": "https://github.com/pennsieve-apps/physio-import",
+   "tag": "v0.1.0",
+   "dependsOn": [
+    "recordings"
+   ],
+   "position": {
+    "x": 450,
+    "y": 250
+   },
+   "cpu": "1024",
+   "memory": "2048",
+   "inputs": []
+  },
+  {
+   "id": "hrv",
+   "type": "processor",
+   "sourceUrl": "https://github.com/pennsieve-apps/ecg-hrv",
+   "tag": "v0.1.0",
+   "dependsOn": [
+    "import"
+   ],
+   "position": {
+    "x": 0,
+    "y": 500
+   },
+   "cpu": "1024",
+   "memory": "2048",
+   "inputs": [
+    {
+     "from": "import",
+     "output": "physio",
+     "input": "physio"
+    }
+   ]
+  },
+  {
+   "id": "bp",
+   "type": "processor",
+   "sourceUrl": "https://github.com/pennsieve-apps/bp-resp",
+   "tag": "v0.1.0",
+   "dependsOn": [
+    "import",
+    "hrv"
+   ],
+   "position": {
+    "x": 900,
+    "y": 500
+   },
+   "cpu": "1024",
+   "memory": "2048",
+   "inputs": [
+    {
+     "from": "import",
+     "output": "physio",
+     "input": "physio"
+    },
+    {
+     "from": "hrv",
+     "output": "hrv",
+     "input": "hrv"
+    }
+   ]
+  },
+  {
+   "id": "report",
+   "type": "processor",
+   "sourceUrl": "https://github.com/pennsieve-apps/physio-report",
+   "tag": "v0.1.0",
+   "dependsOn": [
+    "import",
+    "hrv",
+    "bp"
+   ],
+   "position": {
+    "x": 450,
+    "y": 750
+   },
+   "cpu": "1024",
+   "memory": "2048",
+   "inputs": [
+    {
+     "from": "import",
+     "output": "qc",
+     "input": "qc"
+    },
+    {
+     "from": "hrv",
+     "output": "hrv",
+     "input": "hrv"
+    },
+    {
+     "from": "bp",
+     "output": "bp",
+     "input": "bp"
+    }
+   ]
+  }
+ ],
+ "outputs": [
+  {
+   "id": "report_out",
+   "name": "Report (HTML, PDF)",
+   "from": {
+    "step": "report",
+    "output": "report"
+   },
+   "position": {
+    "x": 450,
+    "y": 1000
+   },
+   "default": {
+    "targetType": "Pennsieve Dataset",
+    "params": {
+     "TARGET_FOLDER": "derivatives/hrv-baroreflex/report"
+    }
+   }
+  },
+  {
+   "id": "hrv_out",
+   "name": "Heart rate and HRV tables",
+   "from": {
+    "step": "hrv",
+    "output": "hrv"
+   },
+   "position": {
+    "x": 0,
+    "y": 750
+   },
+   "default": {
+    "targetType": "Pennsieve Dataset",
+    "params": {
+     "TARGET_FOLDER": "derivatives/hrv-baroreflex/hrv"
+    }
+   }
+  },
+  {
+   "id": "bp_out",
+   "name": "Blood pressure, respiration and BRS tables",
+   "from": {
+    "step": "bp",
+    "output": "bp"
+   },
+   "position": {
+    "x": 900,
+    "y": 750
+   },
+   "default": {
+    "targetType": "Pennsieve Dataset",
+    "params": {
+     "TARGET_FOLDER": "derivatives/hrv-baroreflex/bp-resp"
+    }
+   }
+  }
+ ]
+}

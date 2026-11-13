@@ -1,0 +1,296 @@
+{
+ "name": "Cardiovascular Response to Nerve Stimulation",
+ "summary": "Heart rate, blood pressure and breathing responses to each stimulation, dose-response, thresholds and the neural fulcrum.",
+ "description": "For nerve-stimulation experiments in humans or animals: imports recordings from common acquisition formats into NWB (physio-import), finds every stimulation train and its parameters (stim-events), computes heart rate and heart rate variability from ECG (ecg-hrv) and beat-to-beat blood pressure, respiration and baroreflex sensitivity (bp-resp), measures the response to each train with dose-response fits, thresholds, response surfaces and the neural fulcrum (stim-dose-response), and writes an HTML/PDF report. Species presets for human, pig, dog, rabbit, rat and mouse. Recordings without blood pressure or respiration still run. Research use only.",
+ "inputs": [
+  {
+   "id": "recordings",
+   "name": "Physiological recordings",
+   "description": "Recordings as your acquisition system exports them: EDF/BDF, PhysioNet WFDB, Axon ABF, Spike2 .smr, BIOPAC .acq, NWB, HDF5, MATLAB .mat, CSV/TSV/XLSX, WAV, or BIDS physiological recordings; optionally a channels-map.csv, a stim-map.yaml with parameter tables, and subject metadata (BIDS participants.tsv or SDS subjects.xlsx).",
+   "position": {
+    "x": 450,
+    "y": 0
+   }
+  }
+ ],
+ "processors": [
+  {
+   "id": "import",
+   "type": "processor",
+   "sourceUrl": "https://github.com/pennsieve-apps/physio-import",
+   "tag": "v0.1.0",
+   "dependsOn": [
+    "recordings"
+   ],
+   "position": {
+    "x": 450,
+    "y": 250
+   },
+   "cpu": "1024",
+   "memory": "2048",
+   "inputs": []
+  },
+  {
+   "id": "events",
+   "type": "processor",
+   "sourceUrl": "https://github.com/pennsieve-apps/stim-events",
+   "tag": "v0.1.0",
+   "dependsOn": [
+    "import"
+   ],
+   "position": {
+    "x": 450,
+    "y": 500
+   },
+   "cpu": "512",
+   "memory": "1024",
+   "inputs": [
+    {
+     "from": "import",
+     "output": "physio",
+     "input": "physio"
+    }
+   ]
+  },
+  {
+   "id": "hrv",
+   "type": "processor",
+   "sourceUrl": "https://github.com/pennsieve-apps/ecg-hrv",
+   "tag": "v0.1.0",
+   "dependsOn": [
+    "import",
+    "events"
+   ],
+   "position": {
+    "x": 0,
+    "y": 750
+   },
+   "cpu": "1024",
+   "memory": "2048",
+   "inputs": [
+    {
+     "from": "import",
+     "output": "physio",
+     "input": "physio"
+    },
+    {
+     "from": "events",
+     "output": "events",
+     "input": "events"
+    }
+   ]
+  },
+  {
+   "id": "bp",
+   "type": "processor",
+   "sourceUrl": "https://github.com/pennsieve-apps/bp-resp",
+   "tag": "v0.1.0",
+   "dependsOn": [
+    "import",
+    "events",
+    "hrv"
+   ],
+   "position": {
+    "x": 900,
+    "y": 750
+   },
+   "cpu": "1024",
+   "memory": "2048",
+   "inputs": [
+    {
+     "from": "import",
+     "output": "physio",
+     "input": "physio"
+    },
+    {
+     "from": "events",
+     "output": "events",
+     "input": "events"
+    },
+    {
+     "from": "hrv",
+     "output": "hrv",
+     "input": "hrv"
+    }
+   ]
+  },
+  {
+   "id": "dose",
+   "type": "processor",
+   "sourceUrl": "https://github.com/pennsieve-apps/stim-dose-response",
+   "tag": "v0.1.0",
+   "dependsOn": [
+    "import",
+    "events",
+    "hrv",
+    "bp"
+   ],
+   "position": {
+    "x": 450,
+    "y": 1000
+   },
+   "cpu": "512",
+   "memory": "1024",
+   "inputs": [
+    {
+     "from": "events",
+     "output": "events",
+     "input": "events"
+    },
+    {
+     "from": "hrv",
+     "output": "hrv",
+     "input": "hrv"
+    },
+    {
+     "from": "bp",
+     "output": "bp",
+     "input": "bp"
+    },
+    {
+     "from": "import",
+     "output": "physio",
+     "input": "physio"
+    }
+   ]
+  },
+  {
+   "id": "report",
+   "type": "processor",
+   "sourceUrl": "https://github.com/pennsieve-apps/physio-report",
+   "tag": "v0.1.0",
+   "dependsOn": [
+    "import",
+    "events",
+    "hrv",
+    "bp",
+    "dose"
+   ],
+   "position": {
+    "x": 450,
+    "y": 1250
+   },
+   "cpu": "1024",
+   "memory": "2048",
+   "inputs": [
+    {
+     "from": "import",
+     "output": "qc",
+     "input": "qc"
+    },
+    {
+     "from": "events",
+     "output": "events",
+     "input": "events"
+    },
+    {
+     "from": "hrv",
+     "output": "hrv",
+     "input": "hrv"
+    },
+    {
+     "from": "bp",
+     "output": "bp",
+     "input": "bp"
+    },
+    {
+     "from": "dose",
+     "output": "responses",
+     "input": "responses"
+    }
+   ]
+  }
+ ],
+ "outputs": [
+  {
+   "id": "report_out",
+   "name": "Report (HTML, PDF)",
+   "from": {
+    "step": "report",
+    "output": "report"
+   },
+   "position": {
+    "x": 450,
+    "y": 1500
+   },
+   "default": {
+    "targetType": "Pennsieve Dataset",
+    "params": {
+     "TARGET_FOLDER": "derivatives/stimulation-response/report"
+    }
+   }
+  },
+  {
+   "id": "responses_out",
+   "name": "Responses and dose-response tables",
+   "from": {
+    "step": "dose",
+    "output": "responses"
+   },
+   "position": {
+    "x": 900,
+    "y": 1250
+   },
+   "default": {
+    "targetType": "Pennsieve Dataset",
+    "params": {
+     "TARGET_FOLDER": "derivatives/stimulation-response/responses"
+    }
+   }
+  },
+  {
+   "id": "hrv_out",
+   "name": "Heart rate and HRV tables",
+   "from": {
+    "step": "hrv",
+    "output": "hrv"
+   },
+   "position": {
+    "x": 0,
+    "y": 1000
+   },
+   "default": {
+    "targetType": "Pennsieve Dataset",
+    "params": {
+     "TARGET_FOLDER": "derivatives/stimulation-response/hrv"
+    }
+   }
+  },
+  {
+   "id": "bp_out",
+   "name": "Blood pressure, respiration and BRS tables",
+   "from": {
+    "step": "bp",
+    "output": "bp"
+   },
+   "position": {
+    "x": 1350,
+    "y": 1000
+   },
+   "default": {
+    "targetType": "Pennsieve Dataset",
+    "params": {
+     "TARGET_FOLDER": "derivatives/stimulation-response/bp-resp"
+    }
+   }
+  },
+  {
+   "id": "events_out",
+   "name": "Stimulation events",
+   "from": {
+    "step": "events",
+    "output": "events"
+   },
+   "position": {
+    "x": 900,
+    "y": 500
+   },
+   "default": {
+    "targetType": "Pennsieve Dataset",
+    "params": {
+     "TARGET_FOLDER": "derivatives/stimulation-response/events"
+    }
+   }
+  }
+ ]
+}
