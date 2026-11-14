@@ -1,6 +1,6 @@
 {
  "name": "Cardiovascular Response to Nerve Stimulation",
- "summary": "Heart rate, blood pressure and breathing responses to each stimulation, dose-response, thresholds and the neural fulcrum.",
+ "summary": "Heart rate, blood pressure and breathing responses to nerve stimulation: dose-response, fulcrum.",
  "description": "For nerve-stimulation experiments in humans or animals: imports recordings from common acquisition formats into NWB (physio-import), finds every stimulation train and its parameters (stim-events), computes heart rate and heart rate variability from ECG (ecg-hrv) and beat-to-beat blood pressure, respiration and baroreflex sensitivity (bp-resp), measures the response to each train with dose-response fits, thresholds, response surfaces and the neural fulcrum (stim-dose-response), and writes an HTML/PDF report. Species presets for human, pig, dog, rabbit, rat and mouse. Recordings without blood pressure or respiration still run. Research use only.",
  "inputs": [
   {
