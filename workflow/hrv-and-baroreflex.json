@@ -1,6 +1,6 @@
 {
  "name": "Heart Rate Variability and Baroreflex",
- "summary": "Resting heart rate variability, beat-to-beat blood pressure, respiration, baroreflex sensitivity and RSA, with a report.",
+ "summary": "Resting HRV, beat-to-beat blood pressure, respiration, baroreflex sensitivity and RSA, with report.",
  "description": "For resting or long recordings without stimulation, in humans or animals: imports recordings from common acquisition formats into NWB (physio-import), detects R-peaks and computes heart rate and heart rate variability (time, frequency and non-linear; ecg-hrv), beat-to-beat systolic, diastolic and mean pressure, respiration, spontaneous baroreflex sensitivity and respiratory sinus arrhythmia (bp-resp), and writes an HTML/PDF report with published reference ranges for human recordings. Species presets for human, pig, dog, rabbit, rat and mouse. Recordings without blood pressure or respiration still get HRV. Research use only.",
  "inputs": [
   {
